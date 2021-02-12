@@ -1,5 +1,4 @@
 const express = require('express');
-const bodyparser = require('body-parser');
 const app = express();
 
 const port = 3000;
@@ -21,33 +20,38 @@ function requestReceivingTime(req, res, next) {
     req.receivingTime = new Date();
     next()
 }
-
 //  middleware mount
-app.use(bodyparser.urlencoded({ extended: false }))
-app.use(express.json());
 // app.use(requestLogger);
 app.use(requestReceivingTime)
+app.set('views', './public/views')
+app.set('view engine', 'ejs');
+app.use(express.static('public'))
 
 app.get('/article/get-all', requestLogger, (req, res) => {
-    // res.send(blog)
-    res.render('./list')
+    res.send(blog)
+    // res.render('./list')
 })
+
+app.get('/article/list', (req, res) => {
+    res.render('./list', {
+        name : "Suneel Kumar",
+        articles : blog
+    })
+})
+
+
 
 app.get('/article/get-counts', (req, res) => {
     res.send({ count: blog.length })
 })
 
 app.get('/article/create', (req, res) => {
-    let count = blog.length + 1;
-    blog.push({ title: `Article ${count}`, author: `author ${count}`, createdOn: new Date() })
-    res.send({ count: blog.length })
+    // let count = blog.length + 1;
+    // res.send({ count: blog.length })
+    res.render('./welcome.ejs', { name: 'Suneel Kumar' })
 })
 
-app.post('/article/create', (req, res) => {
-    blog.push({ title: req.body.title, author: req.body.author, createdOn: new Date() })
-})
-
-app.listen(3000, (err) => { 
+app.listen(3000, (err) => {
     if (err) {
         console.log("Err in server Listening");
         console.log(err)
